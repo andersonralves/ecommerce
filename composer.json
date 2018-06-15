@@ -13,7 +13,10 @@
     },
     "autoload": {
         "psr-4": {
-            "": "vendor\\hcodebr\\php-classes\\src"
+            "Hcode\\": "vendor\\hcodebr\\php-classes\\src"
         }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^3.4"
     }
 }
