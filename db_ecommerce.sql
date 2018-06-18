@@ -391,7 +391,12 @@ CREATE TABLE IF NOT EXISTS `tb_productscategories` (
 DELETE FROM `tb_productscategories`;
 /*!40000 ALTER TABLE `tb_productscategories` DISABLE KEYS */;
 INSERT INTO `tb_productscategories` (`idcategory`, `idproduct`) VALUES
-	(6, 4);
+	(6, 4),
+	(5, 5),
+	(5, 6),
+	(5, 7),
+	(5, 8),
+	(5, 9);
 /*!40000 ALTER TABLE `tb_productscategories` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_users
