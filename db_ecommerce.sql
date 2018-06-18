@@ -274,19 +274,6 @@ INSERT INTO `tb_categories` (`idcategory`, `descategory`, `dtregister`) VALUES
 	(9, 'XIamoi', '2018-06-17 13:57:06');
 /*!40000 ALTER TABLE `tb_categories` ENABLE KEYS */;
 
--- Copiando estrutura para tabela db_ecommerce.tb_categoriesproducts
-DROP TABLE IF EXISTS `tb_categoriesproducts`;
-CREATE TABLE IF NOT EXISTS `tb_categoriesproducts` (
-  `idcategory` int(11) NOT NULL,
-  `idproduct` int(11) NOT NULL,
-  PRIMARY KEY (`idcategory`,`idproduct`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Copiando dados para a tabela db_ecommerce.tb_categoriesproducts: ~0 rows (aproximadamente)
-DELETE FROM `tb_categoriesproducts`;
-/*!40000 ALTER TABLE `tb_categoriesproducts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tb_categoriesproducts` ENABLE KEYS */;
-
 -- Copiando estrutura para tabela db_ecommerce.tb_orders
 DROP TABLE IF EXISTS `tb_orders`;
 CREATE TABLE IF NOT EXISTS `tb_orders` (
@@ -387,7 +374,7 @@ CREATE TABLE IF NOT EXISTS `tb_productscategories` (
   CONSTRAINT `fk_productscategories_products` FOREIGN KEY (`idproduct`) REFERENCES `tb_products` (`idproduct`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_productscategories: ~1 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_productscategories: ~8 rows (aproximadamente)
 DELETE FROM `tb_productscategories`;
 /*!40000 ALTER TABLE `tb_productscategories` DISABLE KEYS */;
 INSERT INTO `tb_productscategories` (`idcategory`, `idproduct`) VALUES
@@ -395,7 +382,9 @@ INSERT INTO `tb_productscategories` (`idcategory`, `idproduct`) VALUES
 	(5, 5),
 	(5, 6),
 	(5, 7),
+	(7, 7),
 	(5, 8),
+	(7, 8),
 	(5, 9);
 /*!40000 ALTER TABLE `tb_productscategories` ENABLE KEYS */;
 

@@ -17,7 +17,7 @@ $app->get('/', function() {
 
 });
 
-// Exibir a categoria
+// Exibir a categoria e seus produtos
 $app->get("/categories/:idcategory", function($idcategory){
 
     $page = (isset($_GET['page']))? (int)$_GET['page'] : 1;
@@ -43,6 +43,22 @@ $app->get("/categories/:idcategory", function($idcategory){
         "category"=>$category->getValues(),
         "products"=>$pagination["data"],
         "pages"=>$pages
+    ));
+
+});
+
+
+$app->get("/products/:desurl", function($desurl){
+
+    $product = new Product();
+
+    $product->getFromUrl($desurl);
+
+    $page = new Page();
+
+    $page->setTpl("product-detail", array(
+        "product"=>$product->getValues(),
+        "categories"=>$product->getCategories()
     ));
 
 });
