@@ -3,6 +3,7 @@
 session_start();
 
 require_once("res/config.php");
+require_once('res/functions.php');
 require_once("vendor/autoload.php");
 
 use \Slim\Slim;
