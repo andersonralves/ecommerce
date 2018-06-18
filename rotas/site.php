@@ -2,6 +2,7 @@
 
 use \Hcode\Page;
 use \Hcode\Model\Product;
+use \Hcode\Model\Category;
 
 // Rota Principal
 $app->get('/', function() {
@@ -13,6 +14,22 @@ $app->get('/', function() {
 	$page->setTpl("index", [
 	    'products'=> Product::checkList($products)
     ]);
+
+});
+
+// Exibir a categoria
+$app->get("/categories/:idcategory", function($idcategory){
+
+    $category = new Category();
+
+    $category->get((int)$idcategory);
+
+    $page = new Page();
+
+    $page->setTpl("category", array(
+        "category"=>$category->getValues(),
+        "products"=>Product::checkList($category->getProducts())
+    ));
 
 });
 

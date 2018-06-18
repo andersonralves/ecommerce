@@ -24,23 +24,23 @@ pidcategory INT,
 pdescategory VARCHAR(64)
 )
 BEGIN
-
+	
 	IF pidcategory > 0 THEN
-
+		
 		UPDATE tb_categories
         SET descategory = pdescategory
         WHERE idcategory = pidcategory;
-
+        
     ELSE
-
+		
 		INSERT INTO tb_categories (descategory) VALUES(pdescategory);
-
+        
         SET pidcategory = LAST_INSERT_ID();
-
+        
     END IF;
-
+    
     SELECT * FROM tb_categories WHERE idcategory = pidcategory;
-
+    
 END//
 DELIMITER ;
 
@@ -58,11 +58,11 @@ pvlweight decimal(10,2),
 pdesurl varchar(128)
 )
 BEGIN
-
+	
 	IF pidproduct > 0 THEN
-
+		
 		UPDATE tb_products
-        SET
+        SET 
 			desproduct = pdesproduct,
             vlprice = pvlprice,
             vlwidth = pvlwidth,
@@ -71,18 +71,18 @@ BEGIN
             vlweight = pvlweight,
             desurl = pdesurl
         WHERE idproduct = pidproduct;
-
+        
     ELSE
-
-		INSERT INTO tb_products (desproduct, vlprice, vlwidth, vlheight, vllength, vlweight, desurl)
+		
+		INSERT INTO tb_products (desproduct, vlprice, vlwidth, vlheight, vllength, vlweight, desurl) 
         VALUES(pdesproduct, pvlprice, pvlwidth, pvlheight, pvllength, pvlweight, pdesurl);
-
+        
         SET pidproduct = LAST_INSERT_ID();
-
+        
     END IF;
-
+    
     SELECT * FROM tb_products WHERE idproduct = pidproduct;
-
+    
 END//
 DELIMITER ;
 
@@ -94,13 +94,13 @@ piduser INT,
 pdesip VARCHAR(45)
 )
 BEGIN
-
+	
 	INSERT INTO tb_userspasswordsrecoveries (iduser, desip)
     VALUES(piduser, pdesip);
-
+    
     SELECT * FROM tb_userspasswordsrecoveries
     WHERE idrecovery = LAST_INSERT_ID();
-
+    
 END//
 DELIMITER ;
 
@@ -109,37 +109,37 @@ DROP PROCEDURE IF EXISTS `sp_usersupdate_save`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_usersupdate_save`(
 piduser INT,
-pdesperson VARCHAR(64),
-pdeslogin VARCHAR(64),
-pdespassword VARCHAR(256),
-pdesemail VARCHAR(128),
-pnrphone BIGINT,
+pdesperson VARCHAR(64), 
+pdeslogin VARCHAR(64), 
+pdespassword VARCHAR(256), 
+pdesemail VARCHAR(128), 
+pnrphone BIGINT, 
 pinadmin TINYINT
 )
 BEGIN
-
+	
     DECLARE vidperson INT;
-
+    
 	SELECT idperson INTO vidperson
     FROM tb_users
     WHERE iduser = piduser;
-
+    
     UPDATE tb_persons
-    SET
+    SET 
 		desperson = pdesperson,
         desemail = pdesemail,
         nrphone = pnrphone
 	WHERE idperson = vidperson;
-
+    
     UPDATE tb_users
     SET
 		deslogin = pdeslogin,
         despassword = pdespassword,
         inadmin = pinadmin
 	WHERE iduser = piduser;
-
+    
     SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = piduser;
-
+    
 END//
 DELIMITER ;
 
@@ -150,16 +150,16 @@ CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_users_delete`(
 piduser INT
 )
 BEGIN
-
+	
     DECLARE vidperson INT;
-
+    
 	SELECT idperson INTO vidperson
     FROM tb_users
     WHERE iduser = piduser;
-
+    
     DELETE FROM tb_users WHERE iduser = piduser;
     DELETE FROM tb_persons WHERE idperson = vidperson;
-
+    
 END//
 DELIMITER ;
 
@@ -167,27 +167,27 @@ DELIMITER ;
 DROP PROCEDURE IF EXISTS `sp_users_save`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_users_save`(
-pdesperson VARCHAR(64),
-pdeslogin VARCHAR(64),
-pdespassword VARCHAR(256),
-pdesemail VARCHAR(128),
-pnrphone BIGINT,
+pdesperson VARCHAR(64), 
+pdeslogin VARCHAR(64), 
+pdespassword VARCHAR(256), 
+pdesemail VARCHAR(128), 
+pnrphone BIGINT, 
 pinadmin TINYINT
 )
 BEGIN
-
+	
     DECLARE vidperson INT;
-
+    
 	INSERT INTO tb_persons (desperson, desemail, nrphone)
     VALUES(pdesperson, pdesemail, pnrphone);
-
+    
     SET vidperson = LAST_INSERT_ID();
-
+    
     INSERT INTO tb_users (idperson, deslogin, despassword, inadmin)
     VALUES(vidperson, pdeslogin, pdespassword, pinadmin);
-
+    
     SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = LAST_INSERT_ID();
-
+    
 END//
 DELIMITER ;
 
@@ -274,6 +274,19 @@ INSERT INTO `tb_categories` (`idcategory`, `descategory`, `dtregister`) VALUES
 	(9, 'XIamoi', '2018-06-17 13:57:06');
 /*!40000 ALTER TABLE `tb_categories` ENABLE KEYS */;
 
+-- Copiando estrutura para tabela db_ecommerce.tb_categoriesproducts
+DROP TABLE IF EXISTS `tb_categoriesproducts`;
+CREATE TABLE IF NOT EXISTS `tb_categoriesproducts` (
+  `idcategory` int(11) NOT NULL,
+  `idproduct` int(11) NOT NULL,
+  PRIMARY KEY (`idcategory`,`idproduct`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Copiando dados para a tabela db_ecommerce.tb_categoriesproducts: ~0 rows (aproximadamente)
+DELETE FROM `tb_categoriesproducts`;
+/*!40000 ALTER TABLE `tb_categoriesproducts` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tb_categoriesproducts` ENABLE KEYS */;
+
 -- Copiando estrutura para tabela db_ecommerce.tb_orders
 DROP TABLE IF EXISTS `tb_orders`;
 CREATE TABLE IF NOT EXISTS `tb_orders` (
@@ -327,13 +340,12 @@ CREATE TABLE IF NOT EXISTS `tb_persons` (
   PRIMARY KEY (`idperson`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_persons: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_persons: ~2 rows (aproximadamente)
 DELETE FROM `tb_persons`;
 /*!40000 ALTER TABLE `tb_persons` DISABLE KEYS */;
 INSERT INTO `tb_persons` (`idperson`, `desperson`, `desemail`, `nrphone`, `dtregister`) VALUES
-	(1, 'JoÃ£o Rangel', 'admin@hcode.com.br', 2147483647, '2017-03-01 00:00:00'),
-	(7, 'Suporte', 'suporte@hcode.com.br', 1112345678, '2017-03-15 13:10:27'),
-	(8, 'Regina Lucia de Castro Alves', 'rlstilo@hotmail.com', 14996714687, '2018-06-16 21:09:56');
+	(1, 'Anderson Ricardo Alves', 'andersonricardo.alves@gmail.com', 0, '2017-03-01 00:00:00'),
+	(7, 'Suporte', 'suporte@hcode.com.br', 1112345678, '2017-03-15 13:10:27');
 /*!40000 ALTER TABLE `tb_persons` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_products
@@ -351,7 +363,7 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   PRIMARY KEY (`idproduct`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_products: ~2 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_products: ~7 rows (aproximadamente)
 DELETE FROM `tb_products`;
 /*!40000 ALTER TABLE `tb_products` DISABLE KEYS */;
 INSERT INTO `tb_products` (`idproduct`, `desproduct`, `vlprice`, `vlwidth`, `vlheight`, `vllength`, `vlweight`, `desurl`, `dtregister`) VALUES
@@ -375,9 +387,11 @@ CREATE TABLE IF NOT EXISTS `tb_productscategories` (
   CONSTRAINT `fk_productscategories_products` FOREIGN KEY (`idproduct`) REFERENCES `tb_products` (`idproduct`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_productscategories: ~0 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_productscategories: ~1 rows (aproximadamente)
 DELETE FROM `tb_productscategories`;
 /*!40000 ALTER TABLE `tb_productscategories` DISABLE KEYS */;
+INSERT INTO `tb_productscategories` (`idcategory`, `idproduct`) VALUES
+	(6, 4);
 /*!40000 ALTER TABLE `tb_productscategories` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_users
@@ -394,13 +408,12 @@ CREATE TABLE IF NOT EXISTS `tb_users` (
   CONSTRAINT `fk_users_persons` FOREIGN KEY (`idperson`) REFERENCES `tb_persons` (`idperson`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_users: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_users: ~2 rows (aproximadamente)
 DELETE FROM `tb_users`;
 /*!40000 ALTER TABLE `tb_users` DISABLE KEYS */;
 INSERT INTO `tb_users` (`iduser`, `idperson`, `deslogin`, `despassword`, `inadmin`, `dtregister`) VALUES
 	(1, 1, 'admin', '$2y$12$YlooCyNvyTji8bPRcrfNfOKnVMmZA9ViM2A3IpFjmrpIbp5ovNmga', 1, '2017-03-13 00:00:00'),
-	(7, 7, 'suporte', '$2y$12$HFjgUm/mk1RzTy4ZkJaZBe0Mc/BA2hQyoUckvm.lFa6TesjtNpiMe', 1, '2017-03-15 13:10:27'),
-	(8, 8, 'regina', '$2y$12$MRJB8CpgvnAEL0fefTblruEYYMnt10.cIznqq00wHPtGUZstL.g1u', 1, '2018-06-16 21:09:56');
+	(7, 7, 'suporte', '$2y$12$HFjgUm/mk1RzTy4ZkJaZBe0Mc/BA2hQyoUckvm.lFa6TesjtNpiMe', 1, '2017-03-15 13:10:27');
 /*!40000 ALTER TABLE `tb_users` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_userslogs
