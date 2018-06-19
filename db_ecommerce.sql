@@ -16,6 +16,44 @@
 CREATE DATABASE IF NOT EXISTS `db_ecommerce` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `db_ecommerce`;
 
+-- Copiando estrutura para procedure db_ecommerce.sp_carts_save
+DROP PROCEDURE IF EXISTS `sp_carts_save`;
+DELIMITER //
+CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_carts_save`(
+pidcart INT,
+pdessessionid VARCHAR(64),
+piduser INT,
+pdeszipcode CHAR(8),
+pvlfreight DECIMAL(10,2),
+pnrdays INT
+)
+BEGIN
+
+    IF pidcart > 0 THEN
+        
+        UPDATE tb_carts
+        SET
+            dessessionid = pdessessionid,
+            iduser = piduser,
+            deszipcode = pdeszipcode,
+            vlfreight = pvlfreight,
+            nrdays = pnrdays
+        WHERE idcart = pidcart;
+        
+    ELSE
+        
+        INSERT INTO tb_carts (dessessionid, iduser, deszipcode, vlfreight, nrdays)
+        VALUES(pdessessionid, piduser, pdeszipcode, pvlfreight, pnrdays);
+        
+        SET pidcart = LAST_INSERT_ID();
+        
+    END IF;
+    
+    SELECT * FROM tb_carts WHERE idcart = pidcart;
+
+END//
+DELIMITER ;
+
 -- Copiando estrutura para procedure db_ecommerce.sp_categories_save
 DROP PROCEDURE IF EXISTS `sp_categories_save`;
 DELIMITER //
@@ -216,18 +254,17 @@ DELETE FROM `tb_addresses`;
 -- Copiando estrutura para tabela db_ecommerce.tb_carts
 DROP TABLE IF EXISTS `tb_carts`;
 CREATE TABLE IF NOT EXISTS `tb_carts` (
-  `idcart` int(11) NOT NULL,
+  `idcart` int(11) NOT NULL AUTO_INCREMENT,
   `dessessionid` varchar(64) NOT NULL,
   `iduser` int(11) DEFAULT NULL,
-  `idaddress` int(11) DEFAULT NULL,
+  `deszipcode` char(8) DEFAULT NULL,
   `vlfreight` decimal(10,2) DEFAULT NULL,
+  `nrdays` int(11) DEFAULT NULL,
   `dtregister` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`idcart`),
   KEY `FK_carts_users_idx` (`iduser`),
-  KEY `fk_carts_addresses_idx` (`idaddress`),
-  CONSTRAINT `fk_carts_addresses` FOREIGN KEY (`idaddress`) REFERENCES `tb_addresses` (`idaddress`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_carts_users` FOREIGN KEY (`iduser`) REFERENCES `tb_users` (`iduser`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 -- Copiando dados para a tabela db_ecommerce.tb_carts: ~0 rows (aproximadamente)
 DELETE FROM `tb_carts`;
@@ -267,11 +304,11 @@ CREATE TABLE IF NOT EXISTS `tb_categories` (
 DELETE FROM `tb_categories`;
 /*!40000 ALTER TABLE `tb_categories` DISABLE KEYS */;
 INSERT INTO `tb_categories` (`idcategory`, `descategory`, `dtregister`) VALUES
-	(3, 'Google', '2018-06-17 13:24:11'),
-	(5, 'Android', '2018-06-17 13:37:50'),
-	(6, 'Apple', '2018-06-17 13:37:57'),
-	(7, 'Motorola', '2018-06-17 13:40:01'),
-	(9, 'XIamoi', '2018-06-17 13:57:06');
+	(3, 'Google', '2018-06-17 16:24:11'),
+	(5, 'Android', '2018-06-17 16:37:50'),
+	(6, 'Apple', '2018-06-17 16:37:57'),
+	(7, 'Motorola', '2018-06-17 16:40:01'),
+	(9, 'XIamoi', '2018-06-17 16:57:06');
 /*!40000 ALTER TABLE `tb_categories` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_orders
@@ -310,10 +347,10 @@ CREATE TABLE IF NOT EXISTS `tb_ordersstatus` (
 DELETE FROM `tb_ordersstatus`;
 /*!40000 ALTER TABLE `tb_ordersstatus` DISABLE KEYS */;
 INSERT INTO `tb_ordersstatus` (`idstatus`, `desstatus`, `dtregister`) VALUES
-	(1, 'Em Aberto', '2017-03-13 00:00:00'),
-	(2, 'Aguardando Pagamento', '2017-03-13 00:00:00'),
-	(3, 'Pago', '2017-03-13 00:00:00'),
-	(4, 'Entregue', '2017-03-13 00:00:00');
+	(1, 'Em Aberto', '2017-03-13 03:00:00'),
+	(2, 'Aguardando Pagamento', '2017-03-13 03:00:00'),
+	(3, 'Pago', '2017-03-13 03:00:00'),
+	(4, 'Entregue', '2017-03-13 03:00:00');
 /*!40000 ALTER TABLE `tb_ordersstatus` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_persons
@@ -331,8 +368,8 @@ CREATE TABLE IF NOT EXISTS `tb_persons` (
 DELETE FROM `tb_persons`;
 /*!40000 ALTER TABLE `tb_persons` DISABLE KEYS */;
 INSERT INTO `tb_persons` (`idperson`, `desperson`, `desemail`, `nrphone`, `dtregister`) VALUES
-	(1, 'Anderson Ricardo Alves', 'andersonricardo.alves@gmail.com', 0, '2017-03-01 00:00:00'),
-	(7, 'Suporte', 'suporte@hcode.com.br', 1112345678, '2017-03-15 13:10:27');
+	(1, 'Anderson Ricardo Alves', 'andersonricardo.alves@gmail.com', 0, '2017-03-01 03:00:00'),
+	(7, 'Suporte', 'suporte@hcode.com.br', 1112345678, '2017-03-15 16:10:27');
 /*!40000 ALTER TABLE `tb_persons` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_products
@@ -354,13 +391,13 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
 DELETE FROM `tb_products`;
 /*!40000 ALTER TABLE `tb_products` DISABLE KEYS */;
 INSERT INTO `tb_products` (`idproduct`, `desproduct`, `vlprice`, `vlwidth`, `vlheight`, `vllength`, `vlweight`, `desurl`, `dtregister`) VALUES
-	(3, 'Notebook 14" 4GB 1TB', 1949.99, 345.00, 23.00, 30.00, 2000.00, 'notebook-14-4gb-1tb', '2017-03-13 00:00:00'),
-	(4, 'iPad 128GB Wi-Fi Tela LED IPS 9.7" CÃ¢mera 8MP Prata - Apple', 2999.00, 16.90, 24.00, 0.70, 0.46, 'ipad-128-tela-led-camera8m-prata', '2018-06-17 18:31:58'),
-	(5, 'Smartphone Motorola Moto G5 Plus', 1135.23, 15.20, 7.40, 0.70, 0.16, 'smartphone-motorola-moto-g5-plus', '2018-06-18 12:55:38'),
-	(6, 'Smartphone Moto Z Play', 1887.78, 14.10, 0.90, 1.16, 0.13, 'smartphone-moto-z-play', '2018-06-18 12:55:38'),
-	(7, 'Smartphone Samsung Galaxy J5 Pro', 1299.00, 14.60, 7.10, 0.80, 0.16, 'smartphone-samsung-galaxy-j5', '2018-06-18 12:55:38'),
-	(8, 'Smartphone Samsung Galaxy J7 Prime', 1149.00, 15.10, 7.50, 0.80, 0.16, 'smartphone-samsung-galaxy-j7', '2018-06-18 12:55:38'),
-	(9, 'Smartphone Samsung Galaxy J3 Dual', 679.90, 14.20, 7.10, 0.70, 0.14, 'smartphone-samsung-galaxy-j3', '2018-06-18 12:55:38');
+	(3, 'Notebook 14" 4GB 1TB', 1949.99, 345.00, 23.00, 30.00, 2000.00, 'notebook-14-4gb-1tb', '2017-03-13 03:00:00'),
+	(4, 'iPad 128GB Wi-Fi Tela LED IPS 9.7" CÃ¢mera 8MP Prata - Apple', 2999.00, 16.90, 24.00, 0.70, 0.46, 'ipad-128-tela-led-camera8m-prata', '2018-06-17 21:31:58'),
+	(5, 'Smartphone Motorola Moto G5 Plus', 1135.23, 15.20, 7.40, 0.70, 0.16, 'smartphone-motorola-moto-g5-plus', '2018-06-18 15:55:38'),
+	(6, 'Smartphone Moto Z Play', 1887.78, 14.10, 0.90, 1.16, 0.13, 'smartphone-moto-z-play', '2018-06-18 15:55:38'),
+	(7, 'Smartphone Samsung Galaxy J5 Pro', 1299.00, 14.60, 7.10, 0.80, 0.16, 'smartphone-samsung-galaxy-j5', '2018-06-18 15:55:38'),
+	(8, 'Smartphone Samsung Galaxy J7 Prime', 1149.00, 15.10, 7.50, 0.80, 0.16, 'smartphone-samsung-galaxy-j7', '2018-06-18 15:55:38'),
+	(9, 'Smartphone Samsung Galaxy J3 Dual', 679.90, 14.20, 7.10, 0.70, 0.14, 'smartphone-samsung-galaxy-j3', '2018-06-18 15:55:38');
 /*!40000 ALTER TABLE `tb_products` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_productscategories
@@ -406,8 +443,8 @@ CREATE TABLE IF NOT EXISTS `tb_users` (
 DELETE FROM `tb_users`;
 /*!40000 ALTER TABLE `tb_users` DISABLE KEYS */;
 INSERT INTO `tb_users` (`iduser`, `idperson`, `deslogin`, `despassword`, `inadmin`, `dtregister`) VALUES
-	(1, 1, 'admin', '$2y$12$YlooCyNvyTji8bPRcrfNfOKnVMmZA9ViM2A3IpFjmrpIbp5ovNmga', 1, '2017-03-13 00:00:00'),
-	(7, 7, 'suporte', '$2y$12$HFjgUm/mk1RzTy4ZkJaZBe0Mc/BA2hQyoUckvm.lFa6TesjtNpiMe', 1, '2017-03-15 13:10:27');
+	(1, 1, 'admin', '$2y$12$YlooCyNvyTji8bPRcrfNfOKnVMmZA9ViM2A3IpFjmrpIbp5ovNmga', 1, '2017-03-13 03:00:00'),
+	(7, 7, 'suporte', '$2y$12$HFjgUm/mk1RzTy4ZkJaZBe0Mc/BA2hQyoUckvm.lFa6TesjtNpiMe', 1, '2017-03-15 16:10:27');
 /*!40000 ALTER TABLE `tb_users` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_userslogs
@@ -448,9 +485,9 @@ CREATE TABLE IF NOT EXISTS `tb_userspasswordsrecoveries` (
 DELETE FROM `tb_userspasswordsrecoveries`;
 /*!40000 ALTER TABLE `tb_userspasswordsrecoveries` DISABLE KEYS */;
 INSERT INTO `tb_userspasswordsrecoveries` (`idrecovery`, `iduser`, `desip`, `dtrecovery`, `dtregister`) VALUES
-	(1, 7, '127.0.0.1', NULL, '2017-03-15 13:10:59'),
-	(2, 7, '127.0.0.1', '2017-03-15 13:33:45', '2017-03-15 13:11:18'),
-	(3, 7, '127.0.0.1', '2017-03-15 13:37:35', '2017-03-15 13:37:12');
+	(1, 7, '127.0.0.1', NULL, '2017-03-15 16:10:59'),
+	(2, 7, '127.0.0.1', '2017-03-15 13:33:45', '2017-03-15 16:11:18'),
+	(3, 7, '127.0.0.1', '2017-03-15 13:37:35', '2017-03-15 16:37:12');
 /*!40000 ALTER TABLE `tb_userspasswordsrecoveries` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
