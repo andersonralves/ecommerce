@@ -18,10 +18,9 @@ class Cart extends Model
         if ( isset($_SESSION[Cart::SESSION]) && (int)$_SESSION[Cart::SESSION]["idcart"] > 0) {
 
             $cart->get((int) $_SESSION[Cart::SESSION]["idcart"]);
-
         } else {
 
-            #$cart->getFromSessionId();
+            $cart->getFromSessionId();
 
             if (!(int)$cart->getidcart() > 0) {
                 $data = [
@@ -51,23 +50,8 @@ class Cart extends Model
     {
         $_SESSION[Cart::SESSION] = $this->getValues();
     }
-    
-    public function get($idcart)
-    {
-        $sql = new Sql();
 
-        $results = $sql->select("SELECT * FROM tb_carts WHERE idcart = :idcart",
-            array(
-                ":idcart"=>$idcart
-            ));
-
-        if (count($results) > 0) {
-            $this->setData($results[0]);
-        }
-
-    }
-
-    public function getFromSessionId($idcart)
+    public function getFromSessionId()
     {
         $sql = new Sql();
 
@@ -81,6 +65,20 @@ class Cart extends Model
         }
     }
 
+    public function get($idcart)
+    {
+        $sql = new Sql();
+
+        $results = $sql->select("SELECT * FROM tb_carts WHERE idcart = :idcart", [
+            ":idcart"=>$idcart
+        ]);
+
+        if (count($results) > 0) {
+            $this->setData($results[0]);
+        }
+
+    }
+
     public function save()
     {
         $sql = new Sql();
@@ -88,117 +86,66 @@ class Cart extends Model
         $results = $sql->select("CALL sp_carts_save(:idcart, :dessessionid, :iduser, :dezipcode, :vlfreight, 
             :nrdays)", array(
 
-                ":idcart"=>$this->getidcart(),
-                ":dessessionid"=>$this->getdessessionid(),
-                ":iduser"=>$this->getiduser(),
-                ":dezipcode"=>$this->getdezipcode(),
-                ":vlfreight"=>$this->getvlfreight(),
-                ":nrdays"=>$this->getnrdays()
-            ));
+            ":idcart"=>$this->getidcart(),
+            ":dessessionid"=>$this->getdessessionid(),
+            ":iduser"=>$this->getiduser(),
+            ":dezipcode"=>$this->getdezipcode(),
+            ":vlfreight"=>$this->getvlfreight(),
+            ":nrdays"=>$this->getnrdays()
+        ));
 
         $this->setData($results[0]);
 
-    }
-
-    /*
-    public function delete()
-    {
-        $sql = new Sql();
-
-        $sql->query("DELETE FROM tb_categories WHERE idcategory = :idcategory", array(
-            ":idcategory"=>$this->getidcategory()
-        ));
-
-        Category::updateFile();
-    }
-
-    public static function updateFile()
-    {
-        $categories = Category::listAll();
-
-        $html = array();
-
-        foreach ($categories as $row) {
-            array_push($html, '<li><a href="/categories/' . $row["idcategory"] . '">' . $row["descategory"]. '</a></li>');
-        }
-
-        file_put_contents($_SERVER["DOCUMENT_ROOT"] . DS . "views" . DS . "categories-menu.html", implode("", $html));
-    }
-
-    public function getProducts($related = true)
-    {
-        $sql = new Sql();
-
-        if ($related === true) {
-
-            return $sql->select("
-                SELECT * FROM tb_products WHERE idproduct IN (
-                    SELECT a.idproduct
-                    FROm tb_products a
-                    INNER JOIN tb_productscategories b ON a.idproduct = b.idproduct
-                    WHERE b.idcategory = :idcategory
-                );
-            ", [":idcategory"=>$this->getidcategory()] );
-
-        } else {
-
-            return $sql->select("
-                SELECT * FROM tb_products WHERE idproduct NOT IN (
-                    SELECT a.idproduct
-                    FROm tb_products a
-                    INNER JOIN tb_productscategories b ON a.idproduct = b.idproduct
-                    WHERE b.idcategory = :idcategory
-                );
-            ", [":idcategory"=>$this->getidcategory()] );
-
-        }
-    }
-
-    public function getProductsPage($page = 1, $itemsPerPage = 8)
-    {
-        $start = ($page-1) * $itemsPerPage;
-
-        $sql = new Sql();
-
-        $results = $sql->select("
-            SELECT SQL_CALC_FOUND_ROWS *
-            FROM tb_products a 
-            INNER JOIN tb_productscategories b ON a.idproduct = b.idproduct
-            INNER JOIN tb_categories c ON c.idcategory = b.idcategory
-            WHERE c.idcategory = :idcategory
-            LIMIT $start, $itemsPerPage;            
-        ", [
-            ":idcategory"=>$this->getidcategory()
-        ]);
-
-        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal");
-
-        return [
-            "data"=>Product::checkList($results),
-            'total'=>(int)$resultTotal[0]["nrtotal"],
-            'pages'=>ceil($resultTotal[0]["nrtotal"] / $itemsPerPage)
-        ];
     }
 
     public function addProduct(Product $product)
     {
         $sql = new Sql();
 
-        $sql->query("INSERT INTO tb_productscategories (idcategory, idproduct) VALUES(:idcategory, :idproduct)", [
-                ":idcategory"=>$this->getidcategory(),
-                "idproduct"=>$product->getidproduct()
+        $sql->query("INSERT INTO tb_cartsproducts (idcart, idproduct) VALUES(:idcart, :idproduct)", [
+            ":idcart"=>$this->getidcart(),
+            ":idproduct"=>$product->getidproduct()
         ]);
     }
 
-    public function removeProduct(Product $product)
+    public function removeProduct(Product $product, $all = false)
     {
         $sql = new Sql();
 
-        $sql->query("DELETE FROM tb_productscategories WHERE idcategory = :idcategory AND idproduct = :idproduct", [
-            ":idcategory"=>$this->getidcategory(),
-            "idproduct"=>$product->getidproduct()
-        ]);
-    }
-    */
+        if ($all) {
 
+            $sql->query("UPDATE tb_cartsproducts SET dtremoved = NOW() WHERE idcart = :idcart 
+              AND idproduct = :idproduct AND dtremoved IS NULL", [
+                ":idcart"=>$this->getidcart(),
+                ":idproduct"=>$product->getidproduct()
+            ]);
+
+        } else {
+
+            $sql->query("UPDATE tb_cartsproducts SET dtremoved = NOW() WHERE idcart = :idcart 
+              AND idproduct = :idproduct AND dtremoved IS NULL LIMIT 1", [
+                ":idcart"=>$this->getidcart(),
+                ":idproduct"=>$product->getidproduct()
+            ]);
+
+        }
+
+    }
+
+    public function getProducts()
+    {
+        $sql = new Sql();
+
+        $rows = $sql->select("
+          SELECT b.idproduct, b.desproduct, b.vlprice, b.vlwidth, b.vlheight, b.vllength, b.vlweight, b.desurl,
+            COUNT(*) as nrqtd, SUM(b.vlprice) AS vltotal
+          FROM tb_cartsproducts a INNER JOIN tb_products b ON a.idproduct = b.idproduct 
+          WHERE a.idcart = :idcart AND a.dtremoved IS NULL 
+          GROUP BY b.idproduct, b.desproduct, b.vlprice, b.vlwidth, b.vlheight, b.vllength, b.vlweight, b.desurl
+          ORDER BY b.desproduct", [
+            ":idcart"=>$this->getidcart()
+        ]);
+
+        return Product::checkList($rows);
+    }
 }

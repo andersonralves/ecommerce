@@ -266,9 +266,11 @@ CREATE TABLE IF NOT EXISTS `tb_carts` (
   CONSTRAINT `fk_carts_users` FOREIGN KEY (`iduser`) REFERENCES `tb_users` (`iduser`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_carts: ~0 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_carts: ~1 rows (aproximadamente)
 DELETE FROM `tb_carts`;
 /*!40000 ALTER TABLE `tb_carts` DISABLE KEYS */;
+INSERT INTO `tb_carts` (`idcart`, `dessessionid`, `iduser`, `deszipcode`, `vlfreight`, `nrdays`, `dtregister`) VALUES
+	(1, 'rof84mo3o83spfiq4ubdad4mi7', NULL, NULL, NULL, NULL, '2018-06-19 15:37:30');
 /*!40000 ALTER TABLE `tb_carts` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_cartsproducts
@@ -277,18 +279,73 @@ CREATE TABLE IF NOT EXISTS `tb_cartsproducts` (
   `idcartproduct` int(11) NOT NULL AUTO_INCREMENT,
   `idcart` int(11) NOT NULL,
   `idproduct` int(11) NOT NULL,
-  `dtremoved` datetime NOT NULL,
+  `dtremoved` datetime DEFAULT NULL,
   `dtregister` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`idcartproduct`),
   KEY `FK_cartsproducts_carts_idx` (`idcart`),
   KEY `FK_cartsproducts_products_idx` (`idproduct`),
   CONSTRAINT `fk_cartsproducts_carts` FOREIGN KEY (`idcart`) REFERENCES `tb_carts` (`idcart`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cartsproducts_products` FOREIGN KEY (`idproduct`) REFERENCES `tb_products` (`idproduct`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- Copiando dados para a tabela db_ecommerce.tb_cartsproducts: ~0 rows (aproximadamente)
 DELETE FROM `tb_cartsproducts`;
 /*!40000 ALTER TABLE `tb_cartsproducts` DISABLE KEYS */;
+INSERT INTO `tb_cartsproducts` (`idcartproduct`, `idcart`, `idproduct`, `dtremoved`, `dtregister`) VALUES
+	(1, 1, 4, '2018-06-19 12:51:08', '2018-06-19 15:42:58'),
+	(2, 1, 4, '2018-06-19 14:34:39', '2018-06-19 15:44:42'),
+	(3, 1, 4, '2018-06-19 14:34:42', '2018-06-19 15:49:42'),
+	(4, 1, 3, '2018-06-19 12:51:43', '2018-06-19 15:51:30'),
+	(5, 1, 4, '2018-06-19 14:44:11', '2018-06-19 17:34:51'),
+	(6, 1, 3, '2018-06-19 15:03:49', '2018-06-19 17:34:58'),
+	(7, 1, 5, '2018-06-19 15:03:47', '2018-06-19 17:35:02'),
+	(8, 1, 5, '2018-06-19 15:03:47', '2018-06-19 17:35:10'),
+	(9, 1, 4, '2018-06-19 14:44:11', '2018-06-19 17:42:15'),
+	(10, 1, 4, '2018-06-19 14:44:11', '2018-06-19 17:43:37'),
+	(11, 1, 4, '2018-06-19 14:44:11', '2018-06-19 17:44:08'),
+	(12, 1, 4, '2018-06-19 14:45:13', '2018-06-19 17:44:30'),
+	(13, 1, 4, '2018-06-19 14:45:13', '2018-06-19 17:44:45'),
+	(14, 1, 4, '2018-06-19 14:45:13', '2018-06-19 17:44:52'),
+	(15, 1, 4, '2018-06-19 14:45:13', '2018-06-19 17:45:00'),
+	(16, 1, 4, '2018-06-19 14:45:13', '2018-06-19 17:45:06'),
+	(17, 1, 4, '2018-06-19 14:48:11', '2018-06-19 17:48:08'),
+	(18, 1, 4, '2018-06-19 14:49:24', '2018-06-19 17:48:18'),
+	(19, 1, 4, '2018-06-19 14:51:43', '2018-06-19 17:50:07'),
+	(20, 1, 4, '2018-06-19 14:51:43', '2018-06-19 17:51:38'),
+	(21, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:55:33'),
+	(22, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:56:04'),
+	(23, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:56:22'),
+	(24, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:56:38'),
+	(25, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:57:02'),
+	(26, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:57:54'),
+	(27, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:58:14'),
+	(28, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:58:30'),
+	(29, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:58:30'),
+	(30, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:58:30'),
+	(31, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:58:50'),
+	(32, 1, 4, '2018-06-19 15:01:48', '2018-06-19 17:58:59'),
+	(33, 1, 4, '2018-06-19 15:01:48', '2018-06-19 18:01:42'),
+	(34, 1, 4, '2018-06-19 15:01:48', '2018-06-19 18:01:42'),
+	(35, 1, 4, '2018-06-19 15:01:48', '2018-06-19 18:01:42'),
+	(36, 1, 4, '2018-06-19 15:01:48', '2018-06-19 18:01:42'),
+	(37, 1, 4, '2018-06-19 15:01:48', '2018-06-19 18:01:42'),
+	(38, 1, 4, '2018-06-19 15:02:05', '2018-06-19 18:02:01'),
+	(39, 1, 4, '2018-06-19 15:02:36', '2018-06-19 18:02:01'),
+	(40, 1, 4, '2018-06-19 15:03:45', '2018-06-19 18:02:01'),
+	(41, 1, 4, '2018-06-19 15:03:45', '2018-06-19 18:02:01'),
+	(42, 1, 4, '2018-06-19 15:03:45', '2018-06-19 18:02:01'),
+	(43, 1, 4, '2018-06-19 15:03:45', '2018-06-19 18:02:01'),
+	(44, 1, 4, '2018-06-19 15:03:45', '2018-06-19 18:02:01'),
+	(45, 1, 4, '2018-06-19 15:03:45', '2018-06-19 18:02:12'),
+	(46, 1, 4, '2018-06-19 15:03:45', '2018-06-19 18:02:21'),
+	(47, 1, 9, NULL, '2018-06-19 18:04:55'),
+	(48, 1, 4, NULL, '2018-06-19 18:05:01'),
+	(49, 1, 7, NULL, '2018-06-19 18:05:07'),
+	(50, 1, 8, NULL, '2018-06-19 18:05:12'),
+	(51, 1, 6, NULL, '2018-06-19 18:05:15'),
+	(52, 1, 7, NULL, '2018-06-19 18:05:24'),
+	(53, 1, 7, NULL, '2018-06-19 18:05:24'),
+	(54, 1, 7, NULL, '2018-06-19 18:05:24');
 /*!40000 ALTER TABLE `tb_cartsproducts` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_categories

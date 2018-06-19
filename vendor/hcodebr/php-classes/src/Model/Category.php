@@ -127,7 +127,7 @@ class Category extends Model
 
         $sql->query("INSERT INTO tb_productscategories (idcategory, idproduct) VALUES(:idcategory, :idproduct)", [
                 ":idcategory"=>$this->getidcategory(),
-                "idproduct"=>$product->getidproduct()
+                ":idproduct"=>$product->getidproduct()
         ]);
     }
 
@@ -137,7 +137,7 @@ class Category extends Model
 
         $sql->query("DELETE FROM tb_productscategories WHERE idcategory = :idcategory AND idproduct = :idproduct", [
             ":idcategory"=>$this->getidcategory(),
-            "idproduct"=>$product->getidproduct()
+            ":idproduct"=>$product->getidproduct()
         ]);
     }
 
