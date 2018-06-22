@@ -24,7 +24,7 @@ class Mailer
             $this->tpl->assign($key, $value);
         }
 
-        $html = $this->tpl->draw($tplName, true);
+        $html = utf8_decode($this->tpl->draw($tplName, true));
 
         $this->mail = new \PHPMailer;
 

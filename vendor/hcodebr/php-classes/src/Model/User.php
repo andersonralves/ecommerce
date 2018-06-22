@@ -165,6 +165,7 @@ class User extends Model
                 ":iduser"=>$this->getiduser(),
                 ":desperson"=>utf8_decode($this->getdesperson()),
                 ":deslogin"=>$this->getdeslogin(),
+                ":deslogin"=>$this->getdeslogin(),
                 ":despassword"=>User::getPasswordHash($this->getdespassword()),
                 ":desemail"=>$this->getdesemail(),
                 ":nrphone"=>(int)$this->getnrphone(),
@@ -183,7 +184,7 @@ class User extends Model
         ));
     }
 
-    public static function getForgot($email)
+    public static function getForgot($email, $inadmin = true)
     {
         $sql = new Sql();
 
@@ -217,12 +218,18 @@ class User extends Model
                 $code = openssl_encrypt($dataRecovery['idrecovery'], 'aes-256-cbc', User::SECRET, 0, $iv);
                 $result = base64_encode($iv.$code);
 
-                $link = BASE_URL."admin/forgot/reset?code=$result";
+                if ($inadmin === true) {
+
+                    $link = BASE_URL."admin/forgot/reset?code=$result";
+
+                } else {
+                    $link = BASE_URL."forgot/reset?code=$result";
+                }
 
                 $mailer = new Mailer(
                     $data["desemail"], $data["desperson"], "Redefinir Senha da Hcode Store", "forgot",
                     array(
-                        "name"=>$data["desperson"],
+                        "name"=>utf8_decode($data["desperson"]),
                         "link"=>$link
                     )
                 );
