@@ -17,7 +17,6 @@ CREATE DATABASE IF NOT EXISTS `db_ecommerce` /*!40100 DEFAULT CHARACTER SET utf8
 USE `db_ecommerce`;
 
 -- Copiando estrutura para procedure db_ecommerce.sp_carts_save
-DROP PROCEDURE IF EXISTS `sp_carts_save`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_carts_save`(
 pidcart INT,
@@ -55,7 +54,6 @@ END//
 DELIMITER ;
 
 -- Copiando estrutura para procedure db_ecommerce.sp_categories_save
-DROP PROCEDURE IF EXISTS `sp_categories_save`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_categories_save`(
 pidcategory INT,
@@ -83,7 +81,6 @@ END//
 DELIMITER ;
 
 -- Copiando estrutura para procedure db_ecommerce.sp_products_save
-DROP PROCEDURE IF EXISTS `sp_products_save`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_products_save`(
 pidproduct int(11),
@@ -125,7 +122,6 @@ END//
 DELIMITER ;
 
 -- Copiando estrutura para procedure db_ecommerce.sp_userspasswordsrecoveries_create
-DROP PROCEDURE IF EXISTS `sp_userspasswordsrecoveries_create`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_userspasswordsrecoveries_create`(
 piduser INT,
@@ -143,7 +139,6 @@ END//
 DELIMITER ;
 
 -- Copiando estrutura para procedure db_ecommerce.sp_usersupdate_save
-DROP PROCEDURE IF EXISTS `sp_usersupdate_save`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_usersupdate_save`(
 piduser INT,
@@ -182,7 +177,6 @@ END//
 DELIMITER ;
 
 -- Copiando estrutura para procedure db_ecommerce.sp_users_delete
-DROP PROCEDURE IF EXISTS `sp_users_delete`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_users_delete`(
 piduser INT
@@ -202,7 +196,6 @@ END//
 DELIMITER ;
 
 -- Copiando estrutura para procedure db_ecommerce.sp_users_save
-DROP PROCEDURE IF EXISTS `sp_users_save`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_users_save`(
 pdesperson VARCHAR(64), 
@@ -230,7 +223,6 @@ END//
 DELIMITER ;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_addresses
-DROP TABLE IF EXISTS `tb_addresses`;
 CREATE TABLE IF NOT EXISTS `tb_addresses` (
   `idaddress` int(11) NOT NULL AUTO_INCREMENT,
   `idperson` int(11) NOT NULL,
@@ -252,7 +244,6 @@ DELETE FROM `tb_addresses`;
 /*!40000 ALTER TABLE `tb_addresses` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_carts
-DROP TABLE IF EXISTS `tb_carts`;
 CREATE TABLE IF NOT EXISTS `tb_carts` (
   `idcart` int(11) NOT NULL AUTO_INCREMENT,
   `dessessionid` varchar(64) NOT NULL,
@@ -266,16 +257,16 @@ CREATE TABLE IF NOT EXISTS `tb_carts` (
   CONSTRAINT `fk_carts_users` FOREIGN KEY (`iduser`) REFERENCES `tb_users` (`iduser`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_carts: ~0 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_carts: ~2 rows (aproximadamente)
 DELETE FROM `tb_carts`;
 /*!40000 ALTER TABLE `tb_carts` DISABLE KEYS */;
 INSERT INTO `tb_carts` (`idcart`, `dessessionid`, `iduser`, `deszipcode`, `vlfreight`, `nrdays`, `dtregister`) VALUES
 	(1, 'rof84mo3o83spfiq4ubdad4mi7', NULL, NULL, NULL, NULL, '2018-06-19 12:37:30'),
-	(2, '9tme083kqbm8hp62urj0e3lci5', NULL, '17022000', 211.38, 2, '2018-06-21 14:32:56');
+	(2, '9tme083kqbm8hp62urj0e3lci5', NULL, '17022000', 211.38, 2, '2018-06-21 14:32:56'),
+	(3, 'kj8rmcm73jtb4np37l9ushifu3', 1, NULL, NULL, NULL, '2018-06-22 14:24:45');
 /*!40000 ALTER TABLE `tb_carts` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_cartsproducts
-DROP TABLE IF EXISTS `tb_cartsproducts`;
 CREATE TABLE IF NOT EXISTS `tb_cartsproducts` (
   `idcartproduct` int(11) NOT NULL AUTO_INCREMENT,
   `idcart` int(11) NOT NULL,
@@ -289,7 +280,7 @@ CREATE TABLE IF NOT EXISTS `tb_cartsproducts` (
   CONSTRAINT `fk_cartsproducts_products` FOREIGN KEY (`idproduct`) REFERENCES `tb_products` (`idproduct`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_cartsproducts: ~48 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_cartsproducts: ~62 rows (aproximadamente)
 DELETE FROM `tb_cartsproducts`;
 /*!40000 ALTER TABLE `tb_cartsproducts` DISABLE KEYS */;
 INSERT INTO `tb_cartsproducts` (`idcartproduct`, `idcart`, `idproduct`, `dtremoved`, `dtregister`) VALUES
@@ -358,7 +349,6 @@ INSERT INTO `tb_cartsproducts` (`idcartproduct`, `idcart`, `idproduct`, `dtremov
 /*!40000 ALTER TABLE `tb_cartsproducts` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_categories
-DROP TABLE IF EXISTS `tb_categories`;
 CREATE TABLE IF NOT EXISTS `tb_categories` (
   `idcategory` int(11) NOT NULL AUTO_INCREMENT,
   `descategory` varchar(32) NOT NULL,
@@ -378,7 +368,6 @@ INSERT INTO `tb_categories` (`idcategory`, `descategory`, `dtregister`) VALUES
 /*!40000 ALTER TABLE `tb_categories` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_orders
-DROP TABLE IF EXISTS `tb_orders`;
 CREATE TABLE IF NOT EXISTS `tb_orders` (
   `idorder` int(11) NOT NULL AUTO_INCREMENT,
   `idcart` int(11) NOT NULL,
@@ -401,7 +390,6 @@ DELETE FROM `tb_orders`;
 /*!40000 ALTER TABLE `tb_orders` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_ordersstatus
-DROP TABLE IF EXISTS `tb_ordersstatus`;
 CREATE TABLE IF NOT EXISTS `tb_ordersstatus` (
   `idstatus` int(11) NOT NULL AUTO_INCREMENT,
   `desstatus` varchar(32) NOT NULL,
@@ -420,7 +408,6 @@ INSERT INTO `tb_ordersstatus` (`idstatus`, `desstatus`, `dtregister`) VALUES
 /*!40000 ALTER TABLE `tb_ordersstatus` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_persons
-DROP TABLE IF EXISTS `tb_persons`;
 CREATE TABLE IF NOT EXISTS `tb_persons` (
   `idperson` int(11) NOT NULL AUTO_INCREMENT,
   `desperson` varchar(64) NOT NULL,
@@ -430,7 +417,7 @@ CREATE TABLE IF NOT EXISTS `tb_persons` (
   PRIMARY KEY (`idperson`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_persons: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_persons: ~2 rows (aproximadamente)
 DELETE FROM `tb_persons`;
 /*!40000 ALTER TABLE `tb_persons` DISABLE KEYS */;
 INSERT INTO `tb_persons` (`idperson`, `desperson`, `desemail`, `nrphone`, `dtregister`) VALUES
@@ -439,7 +426,6 @@ INSERT INTO `tb_persons` (`idperson`, `desperson`, `desemail`, `nrphone`, `dtreg
 /*!40000 ALTER TABLE `tb_persons` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_products
-DROP TABLE IF EXISTS `tb_products`;
 CREATE TABLE IF NOT EXISTS `tb_products` (
   `idproduct` int(11) NOT NULL AUTO_INCREMENT,
   `desproduct` varchar(64) NOT NULL,
@@ -467,7 +453,6 @@ INSERT INTO `tb_products` (`idproduct`, `desproduct`, `vlprice`, `vlwidth`, `vlh
 /*!40000 ALTER TABLE `tb_products` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_productscategories
-DROP TABLE IF EXISTS `tb_productscategories`;
 CREATE TABLE IF NOT EXISTS `tb_productscategories` (
   `idcategory` int(11) NOT NULL,
   `idproduct` int(11) NOT NULL,
@@ -492,7 +477,6 @@ INSERT INTO `tb_productscategories` (`idcategory`, `idproduct`) VALUES
 /*!40000 ALTER TABLE `tb_productscategories` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_users
-DROP TABLE IF EXISTS `tb_users`;
 CREATE TABLE IF NOT EXISTS `tb_users` (
   `iduser` int(11) NOT NULL AUTO_INCREMENT,
   `idperson` int(11) NOT NULL,
@@ -505,7 +489,7 @@ CREATE TABLE IF NOT EXISTS `tb_users` (
   CONSTRAINT `fk_users_persons` FOREIGN KEY (`idperson`) REFERENCES `tb_persons` (`idperson`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_users: ~3 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_users: ~2 rows (aproximadamente)
 DELETE FROM `tb_users`;
 /*!40000 ALTER TABLE `tb_users` DISABLE KEYS */;
 INSERT INTO `tb_users` (`iduser`, `idperson`, `deslogin`, `despassword`, `inadmin`, `dtregister`) VALUES
@@ -514,7 +498,6 @@ INSERT INTO `tb_users` (`iduser`, `idperson`, `deslogin`, `despassword`, `inadmi
 /*!40000 ALTER TABLE `tb_users` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_userslogs
-DROP TABLE IF EXISTS `tb_userslogs`;
 CREATE TABLE IF NOT EXISTS `tb_userslogs` (
   `idlog` int(11) NOT NULL AUTO_INCREMENT,
   `iduser` int(11) NOT NULL,
@@ -535,7 +518,6 @@ DELETE FROM `tb_userslogs`;
 /*!40000 ALTER TABLE `tb_userslogs` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_userspasswordsrecoveries
-DROP TABLE IF EXISTS `tb_userspasswordsrecoveries`;
 CREATE TABLE IF NOT EXISTS `tb_userspasswordsrecoveries` (
   `idrecovery` int(11) NOT NULL AUTO_INCREMENT,
   `iduser` int(11) NOT NULL,

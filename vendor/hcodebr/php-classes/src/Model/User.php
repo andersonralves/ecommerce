@@ -10,6 +10,8 @@ class User extends Model
 {
     const SESSION = "User";
     const SECRET = "HcodePhp7_Secret";
+    const ERROR = "UserError";
+    const ERROR_REGISTER = "UserErrorRegister";
 
     public static function getFromSession()
     {
@@ -57,9 +59,10 @@ class User extends Model
     {
         $sql = new Sql();
 
-        $results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :LOGIN", array(
-            ":LOGIN"=>$login,
-        ));
+        $results = $sql->select("
+          SELECT * FROM tb_users a INNER JOIN tb_persons b ON a.idperson = b.idperson 
+          WHERE deslogin = :LOGIN", [":LOGIN"=>$login]
+        );
 
         if (count($results) === 0) {
             throw new \Exception("Usuário inexistente ou senha inválida.");
@@ -72,6 +75,8 @@ class User extends Model
             $user = new User();
 
             $user->setData($data);
+
+            $data['desperson'] = utf8_encode($data['desperson']);
 
             $_SESSION[User::SESSION] = $user->getValues();
 
@@ -86,7 +91,12 @@ class User extends Model
     {
         if (!User::checkLogin($inadmin)) {
 
-            header("Location: /admin/login");
+            if($inadmin) {
+                header("Location: /admin/login");
+            } else {
+                header("Location: /login");
+            }
+
             exit;
 
         }
@@ -110,9 +120,9 @@ class User extends Model
 
         $results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)",
             array(
-                ":desperson"=>$this->getdesperson(),
+                ":desperson"=>utf8_decode($this->getdesperson()),
                 ":deslogin"=>$this->getdeslogin(),
-                ":despassword"=>$this->getdespassword(),
+                ":despassword"=>User::getPasswordHash($this->getdespassword()),
                 ":desemail"=>$this->getdesemail(),
                 ":nrphone"=>$this->getnrphone(),
                 ":inadmin"=>$this->getinadmin()
@@ -130,6 +140,8 @@ class User extends Model
                 ":iduser"=>$iduser
             ));
 
+        $data['desperson'] = utf8_encode($data['desperson']);
+
         $this->setData($results[0]);
     }
 
@@ -140,9 +152,9 @@ class User extends Model
         $results = $sql->select("CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)",
             array(
                 ":iduser"=>$this->getiduser(),
-                ":desperson"=>$this->getdesperson(),
+                ":desperson"=>utf8_decode($this->getdesperson()),
                 ":deslogin"=>$this->getdeslogin(),
-                ":despassword"=>$this->getdespassword(),
+                ":despassword"=>User::getPasswordHash($this->getdespassword()),
                 ":desemail"=>$this->getdesemail(),
                 ":nrphone"=>$this->getnrphone(),
                 ":inadmin"=>$this->getinadmin()
@@ -261,10 +273,47 @@ class User extends Model
 
         $sql->query("UPDATE tb_users SET despassword = :password WHERE iduser = :iduser",
             array(
-                ":password"=>$password,
+                ":password"=>User::getPasswordHash($password),
                 ":iduser"=>$this->getiduser()
             ));
     }
 
+    public static function setError($msg)
+    {
+        $_SESSION[USER::ERROR] = $msg;
+    }
+
+    public static function getError()
+    {
+        $msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ?  $_SESSION[User::ERROR] : "";
+
+        User::clearError();
+
+        return $msg;
+    }
+
+    public static function clearError()
+    {
+        $_SESSION[User::ERROR] = NULL;
+    }
+
+    public static function setErrorRegister($msg)
+    {
+        $_SESSION[USER::ERROR_REGISTER] = $msg;
+    }
+
+    public function updateFreight()
+    {
+        if($this->getdeszipcode() != ''){
+            $this->setFreight($this->getdeszipcode());
+        }
+    }
+
+    public static function getPasswordHash($password)
+    {
+        return  password_hash($password, PASSWORD_DEFAULT, [
+            'cost'=>12
+        ]);
+    }
 
 }
