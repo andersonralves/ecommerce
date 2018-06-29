@@ -2,9 +2,7 @@
 
 namespace Hcode\Model;
 
-use \Hcode\Mailer;
 use \Hcode\Model;
-use \Hcode\Model\User;
 use \Hcode\DB\Sql;
 
 class Cart extends Model
