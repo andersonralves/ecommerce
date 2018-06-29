@@ -292,9 +292,6 @@ $app->get('/boleto/:idorder', function($idorder){
 
     $order->get((int)$idorder);
 
-    dump($order);
-    exit;
-
     // DADOS DO BOLETO PARA O SEU CLIENTE
     $dias_de_prazo_para_pagamento = 10;
     $taxa_boleto = 5.00;
