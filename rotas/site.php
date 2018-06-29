@@ -482,7 +482,6 @@ $app->get("/forgot/sent", function(){
     $page->setTpl("forgot-sent");
 });
 
-
 // Informar a nova senha
 $app->get("/forgot/reset", function(){
 
@@ -531,6 +530,76 @@ $app->get('/profile', function(){
         'profileMsg'=> User::getSuccess(),
         'profileError'=> User::getError()
     ]);
+});
+
+// Alterar Senha
+$app->get('/profile/change-password', function(){
+
+    User::verifyLogin(false);
+
+    $page = new Page();
+
+    $page->setTpl('profile-change-password', [
+        'changePassError'=>User::getError(),
+        'changePassSuccess'=>User::getSuccess()
+    ]);
+
+});
+
+// Alterando Senha
+$app->post('/profile/change-password', function(){
+
+    User::verifyLogin(false);
+
+    if (!isset($_POST['current_pass']) || $_POST['current_pass'] === '') {
+        User::setError("Digite a senha atual.");
+        header("Location: /profile/change-password");
+        exit;
+    }
+
+    if (!isset($_POST['new_pass']) || $_POST['new_pass'] === '') {
+        User::setError("Informe a nova senha.");
+        header("Location: /profile/change-password");
+        exit;
+    }
+
+    if (!isset($_POST['new_pass_confirm']) || $_POST['new_pass_confirm'] === '') {
+        User::setError("Confirme a nova senha.");
+        header("Location: /profile/change-password");
+        exit;
+    }
+
+    if ($_POST['new_pass'] != $_POST['new_pass_confirm']) {
+        User::setError("Senhas não conferem.");
+        header("Location: /profile/change-password");
+        exit;
+    }
+
+    $user = User::getFromSession();
+
+    if (!password_verify($_POST['current_pass'], $user->getdespassword())) {
+        User::setError("A senha está inválida.");
+        header("Location: /profile/change-password");
+        exit;
+    }
+
+    if ($_POST['current_pass'] === $_POST['new_pass']) {
+        User::setError("A sua nova senha deve ser diferente da atual.");
+        header("Location: /profile/change-password");
+        exit;
+    }
+
+    $user->setdespassword($_POST['new_pass']);
+
+    $user->update();
+
+    $_SESSION[User::SESSION] = $user->getValues();
+
+    User::setSuccess("Senha alterada com sucesso.");
+
+    header("Location: /profile/change-password");
+    exit;
+
 });
 
 // Alterado Minha Conta
@@ -620,5 +689,7 @@ $app->get('/profile/orders/:idorder', function($idorder){
     ]);
 
 });
+
+
 
 ?>
