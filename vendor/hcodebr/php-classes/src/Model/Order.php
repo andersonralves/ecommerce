@@ -3,10 +3,14 @@
 namespace Hcode\Model;
 
 use \Hcode\Model;
+use \Hcode\Model\Cart;
 use \Hcode\DB\Sql;
 
 class Order extends Model
 {
+    const ERROR = "OrderError";
+    const SUCCESS = "OrderSuccess";
+
     public function save()
     {
         $sql = new Sql();
@@ -49,4 +53,77 @@ class Order extends Model
         }
     }
 
+    public static function listAll()
+    {
+        $sql = new Sql();
+
+        return $sql->select("
+            SELECT *
+            FROM tb_orders a 
+            INNER JOIN tb_ordersstatus b USING(idstatus)
+            INNER JOIN tb_carts c USING(idcart)
+            INNER JOIN tb_users d ON d.iduser = a.iduser
+            INNER JOIN tb_addresses e USING(idaddress)
+            INNER JOIN tb_persons f ON f.idperson = d.idperson
+            ORDER BY a.dtregister DESC
+        ");
+
+    }
+
+    public function delete()
+    {
+        $sql = new Sql();
+
+        $sql->query("DELETE FROM tb_orders WHERE idorder = :idorder", [
+            ':idorder'=>$this->getidorder()
+        ]);
+    }
+
+    public function getCart():Cart
+    {
+        $cart = new Cart();
+
+        $cart->get((int)$this->getidcart());
+
+        return $cart;
+    }
+
+    public static function setError($msg)
+    {
+        $_SESSION[ORDER::ERROR] = $msg;
+    }
+
+    public static function getError()
+    {
+        $msg = (isset($_SESSION[ORDER::ERROR]) && $_SESSION[ORDER::ERROR]) ?  $_SESSION[ORDER::ERROR] : "";
+
+        ORDER::clearError();
+
+        return $msg;
+    }
+
+    public static function clearError()
+    {
+        $_SESSION[ORDER::ERROR] = NULL;
+    }
+
+    public static function setSuccess($msg)
+    {
+        $_SESSION[ORDER::SUCCESS] = $msg;
+    }
+
+    public static function getSuccess()
+    {
+        $msg = (isset($_SESSION[ORDER::SUCCESS]) && $_SESSION[ORDER::SUCCESS]) ?  $_SESSION[ORDER::SUCCESS] : "";
+
+        ORDER::clearSuccess();
+
+        return $msg;
+    }
+
+    public static function clearSuccess()
+    {
+        $_SESSION[ORDER::SUCCESS] = NULL;
+    }
+    
 }
