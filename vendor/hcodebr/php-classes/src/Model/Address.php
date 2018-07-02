@@ -4,6 +4,7 @@ namespace Hcode\Model;
 
 use \Hcode\Model;
 use \Hcode\DB\Sql;
+use Rain\Tpl\Exception;
 
 class Address extends Model
 {

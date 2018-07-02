@@ -13,11 +13,17 @@ class Sql {
 
 	public function __construct()
 	{
+        $options = [
+            //\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            //\PDO::ATTR_CASE => \PDO::CASE_NATURAL,
+            //\PDO::ATTR_ORACLE_NULLS => \PDO::NULL_EMPTY_STRING
+        ];
 
 		$this->conn = new \PDO(
 			"mysql:dbname=".Sql::DBNAME.";host=".Sql::HOSTNAME, 
 			Sql::USERNAME,
-			Sql::PASSWORD
+			Sql::PASSWORD,
+            $options
 		);
 
 	}
@@ -48,7 +54,6 @@ class Sql {
 		$this->setParams($stmt, $params);
 
 		$stmt->execute();
-
 	}
 
 	public function select($rawQuery, $params = array()):array
