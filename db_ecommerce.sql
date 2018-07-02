@@ -20,16 +20,16 @@ USE `db_ecommerce`;
 DROP PROCEDURE IF EXISTS `sp_addresses_save`;
 DELIMITER //
 CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_addresses_save`(
-	IN `pidaddress` int(11),
-	IN `pidperson` int(11),
-	IN `pdesaddress` varchar(128),
-	IN `pdescomplement` varchar(32),
-	IN `pdescity` varchar(32),
-	IN `pdesstate` varchar(32),
-	IN `pdescountry` varchar(32),
-	IN `pdeszipcode` char(8),
-	IN `pdesdistrict` VARCHAR(50)
-
+pidaddress int(11), 
+pidperson int(11),
+pdesaddress varchar(128),
+pdesnumber varchar(16),
+pdescomplement varchar(32),
+pdescity varchar(32),
+pdesstate varchar(32),
+pdescountry varchar(32),
+pdeszipcode char(8),
+pdesdistrict varchar(32)
 )
 BEGIN
 
@@ -39,6 +39,7 @@ BEGIN
         SET
 			idperson = pidperson,
             desaddress = pdesaddress,
+            desnumber = pdesnumber,
             descomplement = pdescomplement,
             descity = pdescity,
             desstate = pdesstate,
@@ -49,8 +50,8 @@ BEGIN
         
     ELSE
 		
-		INSERT INTO tb_addresses (idperson, desaddress, descomplement, descity, desstate, descountry, deszipcode, desdistrict)
-        VALUES(pidperson, pdesaddress, pdescomplement, pdescity, pdesstate, pdescountry, pdeszipcode, pdesdistrict);
+		INSERT INTO tb_addresses (idperson, desaddress, desnumber, descomplement, descity, desstate, descountry, deszipcode, desdistrict)
+        VALUES(pidperson, pdesaddress, pdesnumber, pdescomplement, pdescity, pdesstate, pdescountry, pdeszipcode, pdesdistrict);
         
         SET pidaddress = LAST_INSERT_ID();
         
@@ -277,15 +278,27 @@ CREATE DEFINER=`ecommerce`@`localhost` PROCEDURE `sp_users_delete`(
 piduser INT
 )
 BEGIN
-	
+    
     DECLARE vidperson INT;
     
+    SET FOREIGN_KEY_CHECKS = 0;
+	
 	SELECT idperson INTO vidperson
     FROM tb_users
     WHERE iduser = piduser;
+	
+    DELETE FROM tb_addresses WHERE idperson = vidperson;
+    DELETE FROM tb_addresses WHERE idaddress IN(SELECT idaddress FROM tb_orders WHERE iduser = piduser);
+	DELETE FROM tb_persons WHERE idperson = vidperson;
     
+    DELETE FROM tb_userslogs WHERE iduser = piduser;
+    DELETE FROM tb_userspasswordsrecoveries WHERE iduser = piduser;
+    DELETE FROM tb_orders WHERE iduser = piduser;
+    DELETE FROM tb_cartsproducts WHERE idcart IN(SELECT idcart FROM tb_carts WHERE iduser = piduser);
+    DELETE FROM tb_carts WHERE iduser = piduser;
     DELETE FROM tb_users WHERE iduser = piduser;
-    DELETE FROM tb_persons WHERE idperson = vidperson;
+    
+    SET FOREIGN_KEY_CHECKS = 1;
     
 END//
 DELIMITER ;
@@ -324,26 +337,24 @@ CREATE TABLE IF NOT EXISTS `tb_addresses` (
   `idaddress` int(11) NOT NULL AUTO_INCREMENT,
   `idperson` int(11) NOT NULL,
   `desaddress` varchar(128) NOT NULL,
+  `desnumber` varchar(16) NOT NULL,
   `descomplement` varchar(32) DEFAULT NULL,
   `descity` varchar(32) NOT NULL,
   `desstate` varchar(32) NOT NULL,
   `descountry` varchar(32) NOT NULL,
   `deszipcode` char(8) NOT NULL,
-  `desdistrict` varchar(50) NOT NULL,
+  `desdistrict` varchar(32) NOT NULL,
   `dtregister` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`idaddress`),
   KEY `fk_addresses_persons_idx` (`idperson`),
   CONSTRAINT `fk_addresses_persons` FOREIGN KEY (`idperson`) REFERENCES `tb_persons` (`idperson`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_addresses: ~1 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_addresses: ~5 rows (aproximadamente)
 DELETE FROM `tb_addresses`;
 /*!40000 ALTER TABLE `tb_addresses` DISABLE KEYS */;
-INSERT INTO `tb_addresses` (`idaddress`, `idperson`, `desaddress`, `descomplement`, `descity`, `desstate`, `descountry`, `deszipcode`, `desdistrict`, `dtregister`) VALUES
-	(4, 1, 'Rua José Pinheiro de Góes', '', 'Bauru', 'SP', 'Brasil', '17034350', 'Distrito Industrial Domingos Biancardi', '2018-06-28 21:32:09'),
-	(5, 1, 'Rua José Pinheiro de Góes', '', 'Bauru', 'SP', 'Brasil', '17034350', 'Distrito Industrial Domingos Biancardi', '2018-06-29 16:17:14'),
-	(6, 1, 'Rua José Pinheiro de Góes', '', 'Bauru', 'SP', 'Brasil', '17034350', 'Distrito Industrial Domingos Biancardi', '2018-06-29 17:45:15'),
-	(7, 1, 'Rua José Pinheiro de Góes', '', 'Bauru', 'SP', 'Brasil', '17034350', 'Distrito Industrial Domingos Biancardi', '2018-06-29 17:46:00');
+INSERT INTO `tb_addresses` (`idaddress`, `idperson`, `desaddress`, `desnumber`, `descomplement`, `descity`, `desstate`, `descountry`, `deszipcode`, `desdistrict`, `dtregister`) VALUES
+	(1, 1, 'Rua Major Antenor Francisco do Nascimento', '3-57', '', 'Bauru', 'SP', 'Brasil', '17066093', 'Jardim Andorfato', '2018-07-02 16:47:04');
 /*!40000 ALTER TABLE `tb_addresses` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_carts
@@ -361,7 +372,7 @@ CREATE TABLE IF NOT EXISTS `tb_carts` (
   CONSTRAINT `fk_carts_users` FOREIGN KEY (`iduser`) REFERENCES `tb_users` (`iduser`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_carts: ~4 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_carts: ~5 rows (aproximadamente)
 DELETE FROM `tb_carts`;
 /*!40000 ALTER TABLE `tb_carts` DISABLE KEYS */;
 INSERT INTO `tb_carts` (`idcart`, `dessessionid`, `iduser`, `deszipcode`, `vlfreight`, `nrdays`, `dtregister`) VALUES
@@ -369,7 +380,7 @@ INSERT INTO `tb_carts` (`idcart`, `dessessionid`, `iduser`, `deszipcode`, `vlfre
 	(2, '9tme083kqbm8hp62urj0e3lci5', NULL, '17022000', 211.38, 2, '2018-06-21 17:32:56'),
 	(3, 'kj8rmcm73jtb4np37l9ushifu3', 1, '17034350', 78.41, 2, '2018-06-22 17:24:45'),
 	(4, '375m99nptcpgnrcu7htcmj8br0', NULL, '17034350', 157.92, 2, '2018-06-28 19:13:52'),
-	(5, 'u0f4irt3hj4lghct4a0nr5k3n1', NULL, '17034350', 88.61, 2, '2018-06-29 16:15:54');
+	(5, 'u0f4irt3hj4lghct4a0nr5k3n1', NULL, '17066093', 123.39, 1, '2018-06-29 16:15:54');
 /*!40000 ALTER TABLE `tb_carts` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_cartsproducts
@@ -385,9 +396,9 @@ CREATE TABLE IF NOT EXISTS `tb_cartsproducts` (
   KEY `FK_cartsproducts_products_idx` (`idproduct`),
   CONSTRAINT `fk_cartsproducts_carts` FOREIGN KEY (`idcart`) REFERENCES `tb_carts` (`idcart`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_cartsproducts_products` FOREIGN KEY (`idproduct`) REFERENCES `tb_products` (`idproduct`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_cartsproducts: ~64 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_cartsproducts: ~75 rows (aproximadamente)
 DELETE FROM `tb_cartsproducts`;
 /*!40000 ALTER TABLE `tb_cartsproducts` DISABLE KEYS */;
 INSERT INTO `tb_cartsproducts` (`idcartproduct`, `idcart`, `idproduct`, `dtremoved`, `dtregister`) VALUES
@@ -458,11 +469,14 @@ INSERT INTO `tb_cartsproducts` (`idcartproduct`, `idcart`, `idproduct`, `dtremov
 	(65, 4, 4, NULL, '2018-06-28 19:14:03'),
 	(66, 4, 4, NULL, '2018-06-28 19:30:40'),
 	(67, 4, 5, NULL, '2018-06-28 19:32:40'),
-	(68, 5, 4, NULL, '2018-06-29 16:16:00'),
+	(68, 5, 4, '2018-06-29 17:50:14', '2018-06-29 16:16:00'),
 	(69, 5, 3, '2018-06-29 13:16:19', '2018-06-29 16:16:13'),
 	(70, 5, 6, '2018-06-29 16:12:27', '2018-06-29 16:16:25'),
-	(71, 5, 9, NULL, '2018-06-29 17:44:57'),
-	(72, 5, 6, '2018-06-29 16:12:59', '2018-06-29 19:12:17');
+	(71, 5, 9, '2018-06-29 16:14:21', '2018-06-29 17:44:57'),
+	(72, 5, 6, '2018-06-29 16:12:59', '2018-06-29 19:12:17'),
+	(73, 5, 9, '2018-06-29 17:50:11', '2018-06-29 19:14:14'),
+	(74, 5, 4, NULL, '2018-06-29 20:50:07'),
+	(75, 5, 4, NULL, '2018-06-29 20:50:24');
 /*!40000 ALTER TABLE `tb_cartsproducts` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_categories
@@ -504,15 +518,15 @@ CREATE TABLE IF NOT EXISTS `tb_orders` (
   CONSTRAINT `fk_orders_carts` FOREIGN KEY (`idcart`) REFERENCES `tb_carts` (`idcart`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_orders_ordersstatus` FOREIGN KEY (`idstatus`) REFERENCES `tb_ordersstatus` (`idstatus`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_orders_users` FOREIGN KEY (`iduser`) REFERENCES `tb_users` (`iduser`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
--- Copiando dados para a tabela db_ecommerce.tb_orders: ~0 rows (aproximadamente)
+-- Copiando dados para a tabela db_ecommerce.tb_orders: ~2 rows (aproximadamente)
 DELETE FROM `tb_orders`;
 /*!40000 ALTER TABLE `tb_orders` DISABLE KEYS */;
 INSERT INTO `tb_orders` (`idorder`, `idcart`, `iduser`, `idstatus`, `idaddress`, `vltotal`, `dtregister`) VALUES
-	(1, 5, 1, 1, 5, 106.72, '2018-06-29 16:17:15'),
-	(2, 5, 1, 1, 6, 5683.60, '2018-06-29 17:45:16'),
-	(3, 5, 1, 1, 7, 5683.60, '2018-06-29 17:46:00');
+	(3, 5, 1, 1, 7, 5683.60, '2018-06-29 17:46:00'),
+	(4, 5, 1, 2, 8, 6121.39, '2018-06-29 20:50:32'),
+	(5, 5, 1, 1, 1, 6121.39, '2018-07-02 16:47:05');
 /*!40000 ALTER TABLE `tb_orders` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela db_ecommerce.tb_ordersstatus
@@ -625,7 +639,7 @@ CREATE TABLE IF NOT EXISTS `tb_users` (
 DELETE FROM `tb_users`;
 /*!40000 ALTER TABLE `tb_users` DISABLE KEYS */;
 INSERT INTO `tb_users` (`iduser`, `idperson`, `deslogin`, `despassword`, `inadmin`, `dtregister`) VALUES
-	(1, 1, 'admin', '$2y$12$YlooCyNvyTji8bPRcrfNfOKnVMmZA9ViM2A3IpFjmrpIbp5ovNmga', 1, '2017-03-13 03:00:00'),
+	(1, 1, 'admin', '$2y$12$NEaPNyR5.EEJSmd4ViU/7.m2itM6AxDuWDFWXWZkD.kITyFGnfcPK', 1, '2017-03-13 03:00:00'),
 	(7, 7, 'suporte', '$2y$12$HFjgUm/mk1RzTy4ZkJaZBe0Mc/BA2hQyoUckvm.lFa6TesjtNpiMe', 1, '2017-03-15 16:10:27'),
 	(8, 8, 'anderson.ti@plasutil.com.br', '$2y$12$mnbOiE.UF.USx0riYmnNDONx5BDga.qoUaAgeo8pHwg2CHeJVe9EW', 0, '2018-06-22 19:45:31');
 /*!40000 ALTER TABLE `tb_users` ENABLE KEYS */;
